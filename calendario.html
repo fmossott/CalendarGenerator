@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<!-- Copyright (C) 2014 - Franco Mossotto -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Creatore Calendari</title>
+<link rel="stylesheet" type="text/css" href="calendario.css">
+<link href='https://fonts.googleapis.com/css?family=Shadows+Into+Light' rel='stylesheet' type='text/css'>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-58044557-1', 'auto');
+  ga('require', 'displayfeatures');
+  ga('require', 'linkid', 'linkid.js');
+  ga('send', 'pageview');
+
+</script>
+<script type="text/javascript">
+	var defaultConfig = {
+		year : 2015,
+		country : "ita",
+		region : "",
+		imgUrl : [
+				"http://tanakamusic.com/wp-content/uploads/2012/03/Gatito.jpg",
+				"http://s1.postimage.org/4wv6nbjx8/1_thumb_572xauto_107200.jpg",
+				"http://www.mondogatti.com/wp-content/uploads/2014/01/gatt24551.jpg",
+				"http://fotogallery.you-ng.it/wp-content/uploads/sites/11/2013/08/1377118328-gattini.jpg",
+				"http://3.bp.blogspot.com/-NQxoupEAHG4/Tg3wDa5RIGI/AAAAAAAAA8M/gSkAbdVh7ms/s1600/Cat_-51.jpg",
+				"http://www.boorp.com/sfondi_gratis_desktop_pc/sfondi_gratis/sfondi_animali_cuccioli/tre_gattini_nella_tazza.jpg",
+				"http://wallpaperart.altervista.org/Immagini/gattini-kittens-1024x768.jpg",
+				"http://www.mondogatti.com/wp-content/uploads/2014/01/gattinifdafda.jpg",
+				"https://lh6.googleusercontent.com/-qoMJxOXRUbQ/AAAAAAAAAAI/AAAAAAAAAAA/l8cvrxGQBgo/photo.jpg",
+				"http://www.ijobs.it/wp-content/uploads/2014/01/gattini-assonnati.jpg",
+				"http://www.deabyday.tv/data/guides/cuccioli-e-co/consigli-in-pi-/Come-aiutare-i-gattini-abbandonati--Alimenta-la-solidariet--2013/image_big_16_9/1gattini-alimenta-solidarietà-2013.jpg",
+				"http://a3.mzstatic.com/us/r30/Purple/v4/41/6c/76/416c766f-7ca4-ae4c-29e6-f17e517dc5e0/screen920x920.jpeg" ]
+	}
+
+	function weekday(day) {
+		var wd = day.getDay();
+		if (wd == 0)
+			wd = 7;
+		return wd;
+	}
+
+	function checkFree(day, cell, freedays) {
+		var free = (day.getDay() == 0);
+		var name;
+		
+		for (var i=0; i<freedays.length; i++) {
+			var f=freedays[i];
+			if (f.date.year==day.getFullYear()
+				&& f.date.month==day.getMonth()+1
+				&& f.date.day==day.getDate()) {
+				free=true;
+				name=f.localName;
+			}
+		}
+		
+		if (free) {
+			cell.addClass("freeday");
+			if (name) {
+				cell.html("<div><p>"+cell.text()+"</p><p class=holidayName>"+name+"</p></div>");
+			}
+		}
+	}
+
+	var lang="it";
+	
+	var months = { 
+			it: [ "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre",	"Dicembre" ],
+			en: [ "January", "February", "March", "April",  "May",    "June",   "July",   "August", "September", "October", "November", "December" ]
+	};
+
+	function insertDays(calendar, year, month, freedays) {
+		// remove previous rows
+		calendar.find("tr.daysrow").remove();
+
+		month--; //Java script month starts from 0
+		calendar.find("#month").text(months[lang][month] + " " + year);
+
+		var tbody = calendar.find("#caltable tbody");
+
+		var day = new Date(year, month, 1);
+		var wd = weekday(day);
+
+		var row;
+
+		if (wd != 1) {
+			row = $("<tr />").addClass("daysrow");
+			tbody.append(row);
+
+			for (var i = 1; i < wd; i++) {
+				$("<td />").appendTo(row);
+			}
+		}
+
+		while (day.getMonth() == month) {
+			if (wd == 1) {
+				row = $("<tr />").addClass("daysrow");
+				tbody.append(row);
+			}
+
+			var cell = $("<td />").text(day.getDate()).addClass("daycell")
+			checkFree(day, cell, freedays);
+			cell.appendTo(row);
+
+			// Move to next day
+			day.setDate(day.getDate() + 1);
+			wd = weekday(day);
+		}
+
+		if (wd > 1) {
+			for (var i = wd; i <= 7; i++) {
+				$("<td />").appendTo(row);
+			}
+		}
+	}
+
+	function makeCalendars() {
+		//clear days
+		$("td.daycell").text("");
+
+		// get and update year
+		var year = $("#year").val();
+		if (!year) {
+			var now = new Date();
+			year = now.getFullYear();
+			if (now.getMonth() > 0)
+				year++;
+			$("#year").val(year);
+			calendarConfig.year = year;
+			writeConfigToCookie();
+		}
+
+		$.ajax({
+			url: "http://kayaposoft.com/enrico/json/v1.0/",
+			jsonp: "jsonp",
+			dataType: "jsonp",
+			data: {
+				action: "getPublicHolidaysForYear",
+				year: year,
+				country: $("#country").val(),
+				region: $("#region").val()
+			},
+			success: function(freedays) {
+    			for (var m = 1; m <= 12; m++) {
+        			var cal = $("#month" + m);
+        			insertDays(cal, year, m, freedays);
+      			}
+    		}
+  		});
+	}
+
+	function setImgFormGroup(group, i) {
+		group.attr("id", "img" + i + "-form-group");
+		var inputId = "img" + i + "-input";
+		group.find("input").attr("id", inputId).attr("onchange",
+				"updateImage(" + i + ")");
+		label = group.find("label");
+		label.attr("for", inputId);
+		if (lang=="it") {
+			label.text("Immagine " + months[lang][i - 1] + ":");
+		} else {
+			label.text(months[lang][i - 1] + " image:");
+		}
+	}
+
+	function duplicateImgInput() {
+		// Clone calendar HTML
+		var template = $("#img1-form-group");
+		setImgFormGroup(template, 1);
+
+		var container = template.parent();
+		for (var i = 2; i <= 12; i++) {
+			var group = template.clone();
+			setImgFormGroup(group, i);
+			group.appendTo(container);
+		}
+	}
+
+	var calendarConfig = {
+		imgUrl : []
+	};
+
+	function writeConfigToCookie() {
+		try {
+			var cookie = "calendarConfig="
+					+ encodeURIComponent(JSON.stringify(calendarConfig));
+
+			var expires = new Date();
+			expires.setFullYear(expires.getFullYear() + 10);
+
+			cookie += "; expires=" + expires.toUTCString();
+
+			document.cookie = cookie;
+		} catch (e) {
+		}
+	}
+
+	function initInputFields() {
+		$("#year").val(calendarConfig.year);
+		$("#country").val(calendarConfig.country);
+		loadRegions();
+		$("#region").val(calendarConfig.region);
+		for (var i = 1; i <= 12; i++) {
+			$("#img" + i + "-input").val(calendarConfig.imgUrl[i - 1]);
+		}
+	}
+	
+	function loadConfigFromCookies() {
+		calendarConfig = defaultConfig;
+
+		try {
+			if (document.cookie) {
+				var cookies = document.cookie.split('; ');
+
+				var info = cookies[0];
+
+				if (info.indexOf("calendarConfig=") == 0) {
+					var value = info.split("=")[1];
+					value = decodeURIComponent(value);
+					var data = JSON.parse(value);
+					if (data) {
+						for (var p in data) {
+							if (calendarConfig[p] instanceof Array && data[p] instanceof Array) {
+								for (var i=0; i<p.length; i++) {
+									if (data[p][i]) calendarConfig[p][i]=data[p][i];
+								}
+							} else {
+								if (data[p]) calendarConfig[p]=data[p];
+							}
+						}
+					}
+				}
+			}
+		} catch (e) {
+		}
+
+		initInputFields();
+	}
+
+	function updateImage(i) {
+		var urlVal = $("#img" + i + "-input").val();
+		var url = urlVal ? urlVal : "noimg.jpg";
+		$("#img" + i).attr("src", url);
+
+		if (calendarConfig.imgUrl[i - 1] != urlVal) {
+			calendarConfig.imgUrl[i - 1] = urlVal;
+			writeConfigToCookie();
+		}
+		
+		resizeImages();
+	}
+
+	function duplicateCalendar() {
+		// Clone calendar HTML
+		var template = $("#month1");
+		updateImage(1);
+		var container = template.parent();
+		for (var i = 2; i <= 12; i++) {
+			var cal = template.clone().attr("id", "month" + i);
+			cal.find("img").attr("id", "img" + i);
+			cal.appendTo(container);
+			updateImage(i);
+		}
+
+		$("#month12").removeClass("break-after");
+	}
+
+	var resizeScheduled=false;
+	
+	function resizeImages() {
+		if (!resizeScheduled) {
+			resizeScheduled=true;
+			setTimeout(fitImages, 1000);
+		}
+	}
+	
+	function fitImg() {
+		if (this.complete) {
+    		var elementWidth = this.naturalWidth || this.width;
+    		var elementHeight = this.naturalHeight || this.height;
+    		var parent = $(this).parent();
+    		var destWidth = parent.outerWidth(); 
+            var destHeight = parent.outerHeight(); 
+    		if (elementWidth<destWidth && elementHeight<destHeight) {
+    			//Need to scale up
+    			var horScale = destWidth/elementWidth;
+    			var verScale = destHeight/elementHeight;
+    			if (horScale<verScale) {
+    				$(this).width(destWidth);
+    				$(this).height("auto");
+    			} else {
+    				$(this).width("auto");
+    				$(this).height(destHeight);
+    			}
+    		} else {
+    			$(this).height("auto");
+    			$(this).width("auto");
+    		}
+		} else {
+			resizeImages();
+		}
+	}
+	
+	function fitImages() {
+		resizeScheduled=false;
+		$("img").each(fitImg);
+	}
+	
+	function setLanguage(callback) {
+		$.ajax({ 
+		    url: "http://ajaxhttpheaders.appspot.com", 
+		    dataType: 'jsonp', 
+		    success: function(headers) {
+		        language = headers['Accept-Language'];
+		        if (language.indexOf("it")==0) {
+		        	lang="it";
+		        } else {
+		        	lang="en";
+		        }
+
+		        $("."+lang).removeClass("hidden");
+		        
+		        callback();
+		    }
+		});		
+	}
+	
+	function onReady() {
+		setLanguage(function() {
+    		duplicateImgInput();
+    		loadCountries(function() {
+        		loadConfigFromCookies();
+        
+        		duplicateCalendar();
+        
+        		makeCalendars();
+        		
+        		resizeImages();
+    		});
+		});
+	}
+
+	function yearChanged() {
+		calendarConfig.year = year;
+		writeConfigToCookie();
+		makeCalendars();
+	}
+	
+	function loadRegions() {
+		var country = $("#country").val();
+		var regions = supportedCountries[country].regions;
+		var select=$("#region");
+		select.find("option").remove();
+		if (regions.length>0) {
+			for (var i=0; i<regions.length; i++) {
+				var r=regions[i];
+				$("<option/>").text(r).val(r).appendTo(select);
+			}country
+		} else {
+			$("<option/>").text("all").val("").appendTo(select);
+		}		
+	}
+	
+	function countriesSelectChanged() {
+		var country = $("#country").val();
+		calendarConfig.country = country;
+
+		loadRegions();
+		
+		regionsSelectChanged();
+	}
+
+	function regionsSelectChanged() {
+		var region = $("#region").val();
+		calendarConfig.region = region;
+		writeConfigToCookie();
+		makeCalendars();
+	}
+	
+	var supportedCountries = {};
+	
+	function loadCountries(callback) {
+		$.ajax({
+			url: "http://kayaposoft.com/enrico/json/v1.0/",
+			jsonp: "jsonp",
+			dataType: "jsonp",
+			data: {
+				action: "getSupportedCountries"
+			},
+			success: function(countries) {
+				var select=$("#country")
+				
+				for (var i=0; i<countries.length; i++) {
+					var c=countries[i];
+					$("<option/>").text(c.fullName).val(c.countryCode).appendTo(select);
+					
+					supportedCountries[c.countryCode]=c;
+				}
+				
+				loadRegions();
+				
+				callback();
+			}
+  		});
+	}
+	
+	$(document).ready(function() {
+		onReady();
+	});
+</script>
+</head>
+<body>
+  <div class="no-print" style="margin: 10px;">
+    <form action="/" id="inputForm">
+      <div style="max-height: 350px; overflow: auto;">
+      	<p class="it hidden">Questa semplice pagina web permette di creare un calendario personalizzato.<br>
+        Inserisci l'anno, il paese per le festività e una URL per l'immagine da inserire per ogni mese.<br>
+        Per stamparlo con Firefox, disabilitare header e footer manualmente.</p>
+        <p class="en hidden">This simple web page allows to create your own personalized calendar.<br>
+        Insert the year, the country for holidays and a URL for the image to insert for each month.<br>
+        To print it with Firefox, manually disable header and footer.</p>
+        <table>
+          <tbody>
+            <tr id="year-form-group">
+              <td><label for="year"><span class="it hidden">Anno:</span><span class="en hidden">Year:</span></label></td>
+              <td colspan="3"><input type="number" id="year" onchange="yearChanged()"></td>
+            </tr>
+            <tr id="year-form-group">
+              <td><label for="country"><span class="it hidden">Paese festività:</span><span class="en hidden">Holidays country:</span></label></td>
+              <td><select style="width:210px; margin-right:19px;" id="country" name="country" onchange="countriesSelectChanged();"></td>
+              <td><label for="region"><span class="it hidden">Regione:</span><span class="en hidden">Region:</span></label></td>
+              <td><select style="width:210px; margin-right:19px;" id="region" name="region" onchange="regionsSelectChanged();"></td>
+            </tr>
+            <tr id="img1-form-group">
+              <td><label for="img1-input">Immagine xxxx:</label></td>
+              <td colspan="3"><input type="url" id="img1-input"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </form>
+    <hr>
+  </div>
+  <div class="calendar break-after" id="month1">
+    <div class="border">
+      <div>
+        <p id="month" class="title" />
+      </div>
+      <div class="img-container">
+        <div class="margin-out">
+          <div class="margin image-container">
+            <img class="picture" src="" id="img1"">
+          </div>
+        </div>
+      </div>
+      <div class="table-container">
+        <table class="caltable" id="caltable">
+          <tbody>
+            <tr>
+              <td class="weekday"><span class="it hidden">Lunedì</span>   <span class="en hidden">Monday</span>   </td>
+              <td class="weekday"><span class="it hidden">Martedì</span>  <span class="en hidden">Tuesday</span>  </td>
+              <td class="weekday"><span class="it hidden">Mercoledì</span><span class="en hidden">Wednesday</span></td>
+              <td class="weekday"><span class="it hidden">Giovedì</span>  <span class="en hidden">Thursday</span> </td>
+              <td class="weekday"><span class="it hidden">Venerdì</span>  <span class="en hidden">Friday</span>   </td>
+              <td class="weekday"><span class="it hidden">Sabato</span>   <span class="en hidden">Saturday</span> </td>
+              <td class="weekday"><span class="it hidden">Domenica</span> <span class="en hidden">Sunday</span>   </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="no-print">
+        <hr>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,128 @@
+@page {
+	size: A4;
+	margin: 0;
+}
+
+@media print {
+	div.calendar {
+		width: 210mm;
+	}
+	div.break-after {
+		page-break-after: always;
+	}
+	
+	.no-print,.no-print * {
+		display: none !important;
+	}
+}
+
+.hidden {
+	display: none;
+}
+
+input {
+	border-radius: 5px;
+	padding: 5px;
+	margin: 2px;
+	width: 100%;
+}
+
+label {
+	font-family: sans-serif;
+	font-weight: bold;
+	font-size: small;
+}
+
+div.calendar {
+	width: 210mm;
+	height: 297mm;
+}
+
+div.border {
+	height: 100%;
+	padding: 1cm;
+}
+
+div.table-container {
+	width: 100%;
+	height: 50%;
+	max-height: 100mm;
+}
+
+div.img-container {
+	width: 100%;
+	height: 50%;
+	max-height: 160mm;
+}
+
+div.margin {
+	padding: 5mm;
+	display: table-cell;
+    vertical-align: middle;
+}
+
+div.margin-out {
+	display: table;
+    height: 100%;
+    width: 100%;
+}
+
+img.picture {
+	max-height: 140mm;
+	max-width: 180mm;
+	margin-left: auto;      
+	margin-right: auto;
+	display: block;
+}
+
+
+.caltable {
+	border-collapse: collapse;
+	border: 1px solid black;
+	width: 100%;
+}
+
+.caltable td {
+	border: 1px solid black;
+	font-family: 'Shadows Into Light', cursive;
+	width: 14%;
+	padding: 3px;
+}
+
+td.weekday {
+	text-align: center;
+	color: #0000A0;
+    font-weight: bold;
+}
+
+td.daycell {
+	font-weight: bold;
+	text-align: right;
+	vertical-align: top;
+	height: 50px;
+}
+
+td.daycell p {
+	margin: 0;
+}
+
+td.daycell p.holidayName {
+	font-size: 8px;
+    font-weight: normal;
+}
+
+td.daycell div {
+	overflow: hidden;
+	height: 50px;
+}
+
+td.freeday {
+	color: #0000A0;
+}
+
+p.title {
+	font-family: 'Shadows Into Light', cursive;
+	font-size: 40px;
+	color: #0000A0;
+	text-align: center;
+}
