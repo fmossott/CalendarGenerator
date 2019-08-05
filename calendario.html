@@ -20,23 +20,27 @@
 
 </script>
 <script type="text/javascript">
+	var baseUrl=window.location.href.replace(/calendario.html/gi, '');
+	var d = new Date();
+	d.setMonth(d.getMonth() + 3);
+
 	var defaultConfig = {
-		year : 2015,
+		year : d.getFullYear(),
 		country : "ita",
 		region : "",
 		imgUrl : [
-				"http://tanakamusic.com/wp-content/uploads/2012/03/Gatito.jpg",
-				"http://s1.postimage.org/4wv6nbjx8/1_thumb_572xauto_107200.jpg",
-				"http://www.mondogatti.com/wp-content/uploads/2014/01/gatt24551.jpg",
-				"http://fotogallery.you-ng.it/wp-content/uploads/sites/11/2013/08/1377118328-gattini.jpg",
-				"http://3.bp.blogspot.com/-NQxoupEAHG4/Tg3wDa5RIGI/AAAAAAAAA8M/gSkAbdVh7ms/s1600/Cat_-51.jpg",
-				"http://www.boorp.com/sfondi_gratis_desktop_pc/sfondi_gratis/sfondi_animali_cuccioli/tre_gattini_nella_tazza.jpg",
-				"http://wallpaperart.altervista.org/Immagini/gattini-kittens-1024x768.jpg",
-				"http://www.mondogatti.com/wp-content/uploads/2014/01/gattinifdafda.jpg",
-				"https://lh6.googleusercontent.com/-qoMJxOXRUbQ/AAAAAAAAAAI/AAAAAAAAAAA/l8cvrxGQBgo/photo.jpg",
-				"http://www.ijobs.it/wp-content/uploads/2014/01/gattini-assonnati.jpg",
-				"http://www.deabyday.tv/data/guides/cuccioli-e-co/consigli-in-pi-/Come-aiutare-i-gattini-abbandonati--Alimenta-la-solidariet--2013/image_big_16_9/1gattini-alimenta-solidarietà-2013.jpg",
-				"http://a3.mzstatic.com/us/r30/Purple/v4/41/6c/76/416c766f-7ca4-ae4c-29e6-f17e517dc5e0/screen920x920.jpeg" ]
+				baseUrl+"pics/01.jpg",
+				baseUrl+"pics/02.jpg",
+				baseUrl+"pics/03.jpg",
+				baseUrl+"pics/04.jpg",
+				baseUrl+"pics/05.jpg",
+				baseUrl+"pics/06.jpg",
+				baseUrl+"pics/07.jpg",
+				baseUrl+"pics/08.jpg",
+				baseUrl+"pics/09.jpg",
+				baseUrl+"pics/10.jpg",
+				baseUrl+"pics/11.jpg",
+				baseUrl+"pics/12.jpg" ]
 	}
 
 	function weekday(day) {
