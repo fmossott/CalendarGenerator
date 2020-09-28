@@ -318,7 +318,7 @@
 	
 	function setLanguage(callback) {
 		$.ajax({ 
-		    url: "http://ajaxhttpheaders.appspot.com", 
+		    url: window.location, 
 		    dataType: 'jsonp', 
 		    success: function(headers) {
 		        language = headers['Accept-Language'];
@@ -331,7 +331,11 @@
 		        $("."+lang).removeClass("hidden");
 		        
 		        callback();
-		    }
+				},
+				error: function() {
+					$(".it").removeClass("hidden");
+					callback()
+				}
 		});		
 	}
 	
