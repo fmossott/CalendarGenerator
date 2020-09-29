@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <title>Creatore Calendari</title>
 <link rel="stylesheet" type="text/css" href="calendario.css">
-<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet" type='text/css'>
+<link href="https://fonts.googleapis.com/css2?family=Courgette&family=Roboto&display=swap" rel="stylesheet">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -22,13 +22,14 @@
 <script type="text/javascript">
 	var baseUrl=window.location.href.replace(/calendario.html/gi, '');
 	var d = new Date();
-	d.setMonth(d.getMonth() + 3);
+	d.setMonth(d.getMonth() + 6);
 
 	var defaultConfig = {
 		year : d.getFullYear(),
 		country : "ita",
 		region : "",
 		imgUrl : [
+				baseUrl+"pics/00.jpg",
 				baseUrl+"pics/01.jpg",
 				baseUrl+"pics/02.jpg",
 				baseUrl+"pics/03.jpg",
@@ -40,8 +41,27 @@
 				baseUrl+"pics/09.jpg",
 				baseUrl+"pics/10.jpg",
 				baseUrl+"pics/11.jpg",
-				baseUrl+"pics/12.jpg" ]
+				baseUrl+"pics/12.jpg",
+				baseUrl+"pics/13.jpg" ],
+			descr : [
+"", 
+"", 
+"", 
+"", 
+"", 
+"", 
+"", 
+"", 
+"", 
+"", 
+"", 
+"", 
+"",
+""
+			]
 	}
+
+	const fixedHolidays = { "Ferragosto and Assunzione" : "Ferragosto"};
 
 	function weekday(day) {
 		var wd = day.getDay();
@@ -61,6 +81,8 @@
 				&& f.date.day==day.getDate()) {
 				free=true;
 				name=f.localName;
+				var fixedName = fixedHolidays[name];	
+				if (fixedName) name = fixedName;
 			}
 		}
 		
@@ -84,44 +106,60 @@
 		calendar.find("tr.daysrow").remove();
 
 		month--; //Java script month starts from 0
-		calendar.find("#month").text(months[lang][month] + " " + year);
+
+		if (month>=12) {
+			month-=12;
+			year++;
+		}
+
+		calendar.find("#month").text(months[lang][month%12].toUpperCase());
+		calendar.find("#year").text(year);
 
 		var tbody = calendar.find("#caltable tbody");
 
 		var day = new Date(year, month, 1);
 		var wd = weekday(day);
-
-		var row;
+		var nextmonth = new Date(year, month+1, 1);
 
 		if (wd != 1) {
-			row = $("<tr />").addClass("daysrow");
-			tbody.append(row);
-
-			for (var i = 1; i < wd; i++) {
-				$("<td />").appendTo(row);
-			}
+			// If not Monday, start from prev Monday
+			day.setDate(day.getDate()-wd+1);
+			wd = 1
 		}
 
-		while (day.getMonth() == month) {
+		var row;
+		for (r=0; r<6*7; r++) {
 			if (wd == 1) {
 				row = $("<tr />").addClass("daysrow");
 				tbody.append(row);
 			}
 
-			var cell = $("<td />").text(day.getDate()).addClass("daycell")
+			var cell = $("<td />").text(day.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false})).addClass("daycell")
 			checkFree(day, cell, freedays);
+			if (day.getMonth()!=month) {
+				cell.addClass("othermonth");
+			}
 			cell.appendTo(row);
 
 			// Move to next day
 			day.setDate(day.getDate() + 1);
 			wd = weekday(day);
 		}
+	}
 
-		if (wd > 1) {
-			for (var i = wd; i <= 7; i++) {
-				$("<td />").appendTo(row);
-			}
-		}
+	function getFreeDays(year, callback) {
+		$.ajax({
+			url: "http://kayaposoft.com/enrico/json/v1.0/",
+			jsonp: "jsonp",
+			dataType: "jsonp",
+			data: {
+				action: "getPublicHolidaysForYear",
+				year: year,
+				country: $("#country").val(),
+				region: $("#region").val()
+			},
+			success: callback
+		});
 	}
 
 	function makeCalendars() {
@@ -140,46 +178,56 @@
 			writeConfigToCookie();
 		}
 
-		$.ajax({
-			url: "http://kayaposoft.com/enrico/json/v1.0/",
-			jsonp: "jsonp",
-			dataType: "jsonp",
-			data: {
-				action: "getPublicHolidaysForYear",
-				year: year,
-				country: $("#country").val(),
-				region: $("#region").val()
-			},
-			success: function(freedays) {
-    			for (var m = 1; m <= 12; m++) {
-        			var cal = $("#month" + m);
-        			insertDays(cal, year, m, freedays);
-      			}
-    		}
-  		});
+		$("#cover .year").text(year);
+
+
+		getFreeDays(year, function(freedays) {
+			getFreeDays(Number(year)+1, function(freedays2) {
+				freedays = freedays.concat(freedays2);
+
+				for (var m = 1; m <= 13; m++) {
+					var cal = $("#month" + m);
+					insertDays(cal, year, m, freedays);
+				}
+			});
+		});
 	}
 
 	function setImgFormGroup(group, i) {
+		var imglabel;
+		if (lang=="it") {
+			if (i==0) {
+				imglabel="Copertina";
+			} else {
+				imglabel = "Immagine " + months[lang][(i - 1)%12] + ":";
+			}
+		} else {
+			if (i==0) {
+				imglabel="Copertina";
+			} else {
+				imglabel = months[lang][(i - 1)%12] + " image:";
+			}			
+		}
+
 		group.attr("id", "img" + i + "-form-group");
 		var inputId = "img" + i + "-input";
-		group.find("input").attr("id", inputId).attr("onchange",
+		var descrId = "img" + i + "-label";
+		group.find(".imginput").attr("id", inputId).attr("onchange",
 				"updateImage(" + i + ")");
-		label = group.find("label");
-		label.attr("for", inputId);
-		if (lang=="it") {
-			label.text("Immagine " + months[lang][i - 1] + ":");
-		} else {
-			label.text(months[lang][i - 1] + " image:");
-		}
+		group.find(".textinput").attr("id", descrId).attr("onchange",
+				"updateImage(" + i + ")");
+		group.find(".imglabel").attr("for", inputId).text(imglabel);
+		group.find(".textlabel").attr("for", descrId);
 	}
 
 	function duplicateImgInput() {
+	
 		// Clone calendar HTML
-		var template = $("#img1-form-group");
-		setImgFormGroup(template, 1);
+		var template = $("#img-form-group");
+		setImgFormGroup(template, 0);
 
 		var container = template.parent();
-		for (var i = 2; i <= 12; i++) {
+		for (var i = 1; i <= 13; i++) {
 			var group = template.clone();
 			setImgFormGroup(group, i);
 			group.appendTo(container);
@@ -210,8 +258,9 @@
 		$("#country").val(calendarConfig.country);
 		loadRegions();
 		$("#region").val(calendarConfig.region);
-		for (var i = 1; i <= 12; i++) {
-			$("#img" + i + "-input").val(calendarConfig.imgUrl[i - 1]);
+		for (var i = 0; i <= 13; i++) {
+			$("#img" + i + "-input").val(calendarConfig.imgUrl[i]);
+			$("#img" + i + "-label").val(calendarConfig.descr[i]);
 		}
 	}
 	
@@ -249,30 +298,35 @@
 
 	function updateImage(i) {
 		var urlVal = $("#img" + i + "-input").val();
+		var descrVal = $("#img" + i + "-label").val();
 		var url = urlVal ? urlVal : "noimg.jpg";
 		$("#img" + i).attr("src", url);
+		$("#img"+i+"-descr").text(descrVal);
 
-		if (calendarConfig.imgUrl[i - 1] != urlVal) {
-			calendarConfig.imgUrl[i - 1] = urlVal;
+		if (calendarConfig.imgUrl[i] != urlVal || calendarConfig.descr[i] != descrVal) {
+			calendarConfig.imgUrl[i] = urlVal;
+			calendarConfig.descr[i] = descrVal;
 			writeConfigToCookie();
 		}
 		
-		resizeImages();
+		//resizeImages();
 	}
 
 	function duplicateCalendar() {
+		updateImage(0);
 		// Clone calendar HTML
 		var template = $("#month1");
 		updateImage(1);
 		var container = template.parent();
-		for (var i = 2; i <= 12; i++) {
+		for (var i = 2; i <= 13; i++) {
 			var cal = template.clone().attr("id", "month" + i);
 			cal.find("img").attr("id", "img" + i);
+			cal.find("#img1-descr").attr("id", "img" + i+"-descr");
 			cal.appendTo(container);
 			updateImage(i);
 		}
 
-		$("#month12").removeClass("break-after");
+		$("#month13").removeClass("break-after");
 	}
 
 	var resizeScheduled=false;
@@ -349,7 +403,7 @@
         
         		makeCalendars();
         		
-        		resizeImages();
+        		//resizeImages();
     		});
 		});
 	}
@@ -445,47 +499,65 @@
               <td><label for="region"><span class="it hidden">Regione:</span><span class="en hidden">Region:</span></label></td>
               <td><select style="width:210px; margin-right:19px;" id="region" name="region" onchange="regionsSelectChanged();"></td>
             </tr>
-            <tr id="img1-form-group">
-              <td><label for="img1-input">Immagine xxxx:</label></td>
-              <td colspan="3"><input type="url" id="img1-input"></td>
+            <tr id="img-form-group">
+              <td><label class="imglabel">Immagine xxxx:</label></td>
+							<td colspan="3"><input class="imginput" type="url"></td>
+              <td><label class="textlabel">Descr:</label></td>
+							<td><input class="textinput" type="text" value="Text"></td>
             </tr>
           </tbody>
         </table>
       </div>
     </form>
     <hr>
-  </div>
-  <div class="calendar break-after" id="month1">
-    <div class="border">
-      <div>
-        <p id="month" class="title" />
-      </div>
-      <div class="img-container">
-        <div class="margin-out">
-          <div class="margin image-container">
-            <img class="picture" src="" id="img1"">
-          </div>
-        </div>
-      </div>
-      <div class="table-container">
-        <table class="caltable" id="caltable">
-          <tbody>
-            <tr>
-              <td class="weekday"><span class="it hidden">Lunedì</span>   <span class="en hidden">Monday</span>   </td>
-              <td class="weekday"><span class="it hidden">Martedì</span>  <span class="en hidden">Tuesday</span>  </td>
-              <td class="weekday"><span class="it hidden">Mercoledì</span><span class="en hidden">Wednesday</span></td>
-              <td class="weekday"><span class="it hidden">Giovedì</span>  <span class="en hidden">Thursday</span> </td>
-              <td class="weekday"><span class="it hidden">Venerdì</span>  <span class="en hidden">Friday</span>   </td>
-              <td class="weekday"><span class="it hidden">Sabato</span>   <span class="en hidden">Saturday</span> </td>
-              <td class="weekday"><span class="it hidden">Domenica</span> <span class="en hidden">Sunday</span>   </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="no-print">
-        <hr>
-      </div>
-    </div>
-  </div>
+	</div>
+	<div id="cover" class="break-after calendar">
+		<div class="img-container">
+			<img class="picture" src="" id="img0">
+			<p class="description">&nbsp;<span id="img0-descr" >---</span></p>
+		</div>
+		<div class="coveryear monthbox">
+			<p id="month" class="month">CALENDARIO</p>
+			<p id="year" class="year">20xx</p>
+		</div>
+	</div>
+	<div id="month1" class="break-after calendar">
+		<div class="img-container">
+			<img class="picture" src="" id="img1">
+			<p class="description">&nbsp;<span id="img1-descr" >---</span></p>
+		</div>
+		<div>
+			<table class="layout">
+				<tr>
+					<td class="monthbox">
+						<p id="month" class="month" />
+						<p id="year" class="year" />
+					</td>
+					<td>
+						<hr class="emptyline">
+						<hr class="emptyline">
+						<hr class="emptyline">
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="border">
+			<div class="table-container">
+				<table class="caltable" id="caltable">
+					<tbody>
+						<tr>
+							<td class="weekday"><span class="it hidden">Lunedì</span> <span class="en hidden">Monday</span> </td>
+							<td class="weekday"><span class="it hidden">Martedì</span> <span class="en hidden">Tuesday</span> </td>
+							<td class="weekday"><span class="it hidden">Mercoledì</span><span class="en hidden">Wednesday</span></td>
+							<td class="weekday"><span class="it hidden">Giovedì</span> <span class="en hidden">Thursday</span> </td>
+							<td class="weekday"><span class="it hidden">Venerdì</span> <span class="en hidden">Friday</span> </td>
+							<td class="weekday"><span class="it hidden">Sabato</span> <span class="en hidden">Saturday</span> </td>
+							<td class="weekday"><span class="it hidden freeday">Domenica</span> <span class="en hidden freeday">Sunday</span> </td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+</div>
 </body>
 </html>

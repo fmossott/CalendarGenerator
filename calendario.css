@@ -1,30 +1,43 @@
 @page {
-	size: A4;
+	size: 216mm 303mm;
 	margin: 0;
 }
 
 @media print {
 	div.calendar {
-		width: 210mm;
+		width: 216mm;
 	}
+
 	div.break-after {
 		page-break-after: always;
 	}
-	
 	.no-print,.no-print * {
 		display: none !important;
 	}
+		
+}
+@media screen {
+	div.break-after {
+		padding-bottom: 5px;
+		border-bottom: 1px solid black;
+		margin-bottom: 5px;
+	}
+}
+
+body {
+	margin: 0px;
 }
 
 .hidden {
 	display: none;
 }
 
+
 input {
-	border-radius: 5px;
-	padding: 5px;
+	border-radius: 2px;
+	padding: 2px;
 	margin: 2px;
-	width: 100%;
+	width: -webkit-fill-available;
 }
 
 label {
@@ -34,31 +47,37 @@ label {
 }
 
 div.calendar {
-	width: 210mm;
-	height: 297mm;
+	width: 216mm;
+	height: 303mm;
+}
+
+#cover {
+	background-color: #3d5d78;
 }
 
 div.border {
-	height: 100%;
-	padding: 1cm;
+	padding: 13mm;
+	padding-top: 5mm;
+	display: block;
 }
 
 div.table-container {
 	width: 100%;
 	height: 50%;
-	max-height: 100mm;
+	max-height: 150mm;
 }
 
 div.img-container {
 	width: 100%;
-	height: 50%;
-	max-height: 160mm;
+}
+
+#cover div.img-container {
+	 padding-top: 60mm;
 }
 
 div.margin {
-	padding: 5mm;
 	display: table-cell;
-    vertical-align: middle;
+  vertical-align: middle;
 }
 
 div.margin-out {
@@ -68,38 +87,42 @@ div.margin-out {
 }
 
 img.picture {
-	max-height: 140mm;
-	max-width: 180mm;
-	margin-left: auto;      
-	margin-right: auto;
+	height: 108mm;
+	width: 190mm;
+	max-height: 108mm;
+	max-width: 190mm;
+	margin: 13mm;
+	margin-top: 18mm;
+	margin-bottom: 0mm;
+
 	display: block;
+	object-fit: cover;
 }
 
 
 .caltable {
 	border-collapse: collapse;
-	border: 1px solid black;
 	width: 100%;
 }
 
 .caltable td {
 	border: 1px solid black;
 	font-family: 'Roboto', sans-serif;
-	width: 14%;
+	width: 14.3%;
 	padding: 3px;
 }
 
 td.weekday {
-	text-align: center;
-	color: #0000A0;
-    font-weight: bold;
+	text-align: left;
+	font-weight: bold;
+	border: 0px;
 }
 
 td.daycell {
 	font-weight: bold;
-	text-align: right;
+	text-align: left;
 	vertical-align: top;
-	height: 50px;
+	height: 62px;
 }
 
 td.daycell p {
@@ -116,13 +139,71 @@ td.daycell div {
 	height: 50px;
 }
 
-td.freeday {
-	color: #0000A0;
+.freeday {
+	color: #3986c5;
 }
 
-p.title {
+p.month {
 	font-family: 'Roboto', sans-serif;
-	font-size: 40px;
-	color: #0000A0;
-	text-align: center;
+	font-size: 35px;
+	color: white;
+	text-align: left;
+	margin-block-start: 2mm;
+	margin-block-end: 0mm;
+}
+
+p.year {
+	font-family: 'Roboto', sans-serif;
+	font-size: 50px;
+	color: black;
+	text-align: left;
+	margin-block-start: 0mm;
+	margin-block-end: 2mm;
+}
+
+#cover .year {
+	font-size: 100px;
+}
+
+td.othermonth {
+	opacity: 0.4;
+}
+
+table.layout {
+	border: 0px;
+	width: 100%;
+	margin-block-start: 0mm;
+	margin-block-end: 3mm;
+	border-spacing:	0px;
+}
+
+hr.emptyline {
+	margin-top: 8mm;
+	border-width: 1px;
+	margin-left: 5mm;
+	margin-right: 13mm;
+}
+
+.monthbox {
+	background-color: #bcbcbc;
+	padding-left: 13mm;
+}
+
+
+td.monthbox {
+	width: 40%;
+}
+
+#cover .monthbox {
+	padding-top: 1px;
+	padding-bottom: 1px;
+	margin-top: 25mm;
+}
+
+p.description {
+	font-family: 'Courgette', cursive;
+	margin-block-start: 2mm;
+	margin-block-end: 2mm;
+	text-align: right;
+	margin-right: 13mm
 }
