@@ -7,6 +7,7 @@
 	--margin-external: calc(var(--page-bleed-area) + 10mm);
 	--img-width: calc(var(--page-width) - 20mm);
 	--img-height: calc( (var(--page-height) - 25mm) * 0.4);
+	--day-height: 62px;
 }
 
 @page {
@@ -132,7 +133,7 @@ td.daycell {
 	font-weight: bold;
 	text-align: left;
 	vertical-align: top;
-	height: 62px;
+	height: var(--day-height);
 }
 
 td.daycell p {
