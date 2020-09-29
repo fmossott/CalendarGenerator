@@ -1,11 +1,23 @@
+:root {
+	--page-width: 210mm;
+	--page-height: 297mm;
+	--page-bleed-area: 3mm;
+	--page-tot-width: calc(var(--page-width) + 2*var(--page-bleed-area));
+	--page-tot-height: calc(var(--page-height) + 2*var(--page-bleed-area));
+	--margin-external: calc(var(--page-bleed-area) + 10mm);
+	--img-width: calc(var(--page-width) - 20mm);
+	--img-height: calc( (var(--page-height) - 25mm) * 0.4);
+}
+
 @page {
-	size: 216mm 303mm;
+	size: var(--page-tot-width) var(--page-tot-height);
 	margin: 0;
 }
 
 @media print {
 	div.calendar {
-		width: 216mm;
+		width: var(--page-tot-width);
+		page-break-inside: avoid;
 	}
 
 	div.break-after {
@@ -17,10 +29,8 @@
 		
 }
 @media screen {
-	div.break-after {
-		padding-bottom: 5px;
-		border-bottom: 1px solid black;
-		margin-bottom: 5px;
+	div.calendar {
+		border: 1px solid black;
 	}
 }
 
@@ -46,61 +56,59 @@ label {
 	font-size: small;
 }
 
-div.calendar {
-	width: 216mm;
-	height: 302.8mm;
+.calendar {
+	width: calc(var(--page-width) + 2*var(--page-bleed-area));
+	height: calc(var(--page-height) + 2*var(--page-bleed-area) - 0.3mm);
+}
+
+.page-border {
+	padding: var(--margin-external);
+	padding-top: calc(5mm + var(--margin-external));
 }
 
 #cover {
 	background-color: #3d5d78;
 }
 
-div.border {
-	padding: 13mm;
+.table-border {
 	padding-top: 5mm;
-	padding-bottom: 0px;
 	display: block;
 }
 
-div.table-container {
+.table-container {
 	width: 100%;
 	height: 50%;
-	max-height: 150mm;
+	max-height: calc(var(--page-height)/2);
 }
 
-div.img-container {
-	padding-top: 13mm;
+.img-container {
 	width: 100%;
+	margin: auto;
 }
 
-#cover div.img-container {
+#cover .img-container {
 	 padding-top: 60mm;
 }
 
-div.margin {
-	display: table-cell;
-  vertical-align: middle;
-}
-
-div.margin-out {
-	display: table;
-    height: 100%;
-    width: 100%;
-}
-
 img.picture {
-	height: 108mm;
-	width: 190mm;
-	max-height: 108mm;
-	max-width: 190mm;
-	margin: 13mm;
-	margin-top: 5mm;
-	margin-bottom: 0mm;
+	height: var(--img-height);
+	width: var(--img-width);
+	max-height: var(--img-height);
+	max-width: var(--img-width);
+	margin: auto;
 
 	display: block;
 	object-fit: cover;
 }
 
+p.description {
+	font-family: 'Courgette', cursive;
+	margin-block-start: 2mm;
+	margin-block-end: 2mm;
+	text-align: right;
+	width: var(--img-width);
+	margin: auto;
+}
 
 .caltable {
 	border-collapse: collapse;
@@ -110,7 +118,7 @@ img.picture {
 .caltable td {
 	border: 1px solid black;
 	font-family: 'Roboto', sans-serif;
-	width: 14.3%;
+	width: calc(100% / 7);
 	padding: 3px;
 }
 
@@ -171,41 +179,38 @@ td.othermonth {
 	opacity: 0.4;
 }
 
-table.layout {
-	border: 0px;
-	width: 100%;
-	margin-block-start: 0mm;
-	margin-block-end: 3mm;
-	border-spacing:	0px;
-}
-
 hr.emptyline {
 	margin-top: 8mm;
 	border-width: 1px;
 	margin-left: 5mm;
-	margin-right: 13mm;
+}
+
+.month-row {
+	width: 100%;
+	margin-block-start: 0mm;
+	margin-block-end: 3mm;
 }
 
 .monthbox {
 	background-color: #bcbcbc;
-	padding-left: 13mm;
+	margin-left: calc(0mm - var(--margin-external));
+	padding-left: var(--margin-external);
 	padding-top: 2mm;
 	padding-bottom: 2mm;
 }
 
-
-td.monthbox {
+.month-row .monthbox {
 	width: 40%;
+	display: inline-block;
+}
+
+.month-row .lines {
+	width: 59%;
+	display: inline-block;
 }
 
 #cover .monthbox {
 	margin-top: 25mm;
+	margin-right: calc(0px - var(--margin-external));
 }
 
-p.description {
-	font-family: 'Courgette', cursive;
-	margin-block-start: 2mm;
-	margin-block-end: 2mm;
-	text-align: right;
-	margin-right: 13mm
-}
