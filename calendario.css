@@ -48,7 +48,7 @@ label {
 
 div.calendar {
 	width: 216mm;
-	height: 303mm;
+	height: 302.8mm;
 }
 
 #cover {
@@ -58,6 +58,7 @@ div.calendar {
 div.border {
 	padding: 13mm;
 	padding-top: 5mm;
+	padding-bottom: 0px;
 	display: block;
 }
 
@@ -68,6 +69,7 @@ div.table-container {
 }
 
 div.img-container {
+	padding-top: 13mm;
 	width: 100%;
 }
 
@@ -92,7 +94,7 @@ img.picture {
 	max-height: 108mm;
 	max-width: 190mm;
 	margin: 13mm;
-	margin-top: 18mm;
+	margin-top: 5mm;
 	margin-bottom: 0mm;
 
 	display: block;
