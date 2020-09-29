@@ -387,7 +387,7 @@
 		        callback();
 				},
 				error: function() {
-					$(".it").removeClass("hidden");
+					$("."+lang).removeClass("hidden");
 					callback()
 				}
 		});		
@@ -517,8 +517,9 @@
 			<p class="description">&nbsp;<span id="img0-descr" >---</span></p>
 		</div>
 		<div class="coveryear monthbox">
-			<p id="month" class="month">CALENDARIO</p>
+			<p id="month" class="it hidden month">CALENDARIO</p>
 			<p id="year" class="year">20xx</p>
+			<p id="month" class="en hidden month">CALENDAR</p>
 		</div>
 	</div>
 	<div id="month1" class="break-after calendar">

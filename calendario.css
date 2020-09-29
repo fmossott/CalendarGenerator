@@ -148,7 +148,7 @@ p.month {
 	font-size: 35px;
 	color: white;
 	text-align: left;
-	margin-block-start: 2mm;
+	margin-block-start: 0mm;
 	margin-block-end: 0mm;
 }
 
@@ -158,7 +158,7 @@ p.year {
 	color: black;
 	text-align: left;
 	margin-block-start: 0mm;
-	margin-block-end: 2mm;
+	margin-block-end: 0mm;
 }
 
 #cover .year {
@@ -187,6 +187,8 @@ hr.emptyline {
 .monthbox {
 	background-color: #bcbcbc;
 	padding-left: 13mm;
+	padding-top: 2mm;
+	padding-bottom: 2mm;
 }
 
 
@@ -195,8 +197,6 @@ td.monthbox {
 }
 
 #cover .monthbox {
-	padding-top: 1px;
-	padding-bottom: 1px;
 	margin-top: 25mm;
 }
 
