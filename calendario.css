@@ -19,7 +19,6 @@
 
 @media print {
 	div.calendar {
-		width: var(--page-tot-width);
 		page-break-inside: avoid;
 	}
 
@@ -67,17 +66,19 @@ label {
 }
 
 .calendar {
-	width: calc(var(--page-width) + 2*var(--page-bleed-area));
-	height: calc(var(--page-height) + 2*var(--page-bleed-area) - 0.3mm);
+	width: var(--page-tot-width);
+	height: calc(var(--page-tot-height) - 1mm);
 }
 
 .page-border {
 	padding: var(--margin-external);
 	padding-top: calc(5mm + var(--margin-external));
+	padding-bottom: 0;
 }
 
 #cover {
 	background-color: #3d5d78;
+	height: calc(var(--page-tot-height) - 0.5mm);
 }
 
 .table-border {
