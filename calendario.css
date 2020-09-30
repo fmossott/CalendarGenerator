@@ -8,6 +8,8 @@
 	--img-width: calc(var(--page-width) - 20mm);
 	--img-height: calc( (var(--page-height) - 25mm) * 0.4);
 	--day-height: 62px;
+	--largepage-display: block;
+	--smallpage-display: none;
 }
 
 @page {
@@ -43,6 +45,13 @@ body {
 	display: none;
 }
 
+.largepage {
+	display: var(--largepage-display);
+}
+
+.small {
+	display: var(--smallpage-display);
+}
 
 input {
 	border-radius: 2px;
@@ -88,7 +97,7 @@ label {
 }
 
 #cover .img-container {
-	 padding-top: 60mm;
+	 padding-top: calc( var(--page-height) * 0.2 );
 }
 
 img.picture {
@@ -116,38 +125,41 @@ p.description {
 	width: 100%;
 }
 
-.caltable td {
+.caltable td,th {
 	border: 1px solid black;
 	font-family: 'Roboto', sans-serif;
+	font-size: calc( var(--page-height) * 0.015 );
 	width: calc(100% / 7);
 	padding: 3px;
 }
 
-td.weekday {
+.weekday {
 	text-align: left;
 	font-weight: bold;
 	border: 0px;
 }
 
-td.daycell {
+.daycell {
 	font-weight: bold;
 	text-align: left;
 	vertical-align: top;
 	height: var(--day-height);
+	max-height: var(--day-height);
 }
 
-td.daycell p {
+.daycell p {
 	margin: 0;
 }
 
-td.daycell p.holidayName {
-	font-size: 8px;
-    font-weight: normal;
+.daycell p.holidayName {
+	font-size: calc( var(--page-height) * 0.007 );
+	font-weight: normal;
 }
 
-td.daycell div {
+.daycell div {
 	overflow: hidden;
-	height: 50px;
+	height: calc(var(--day-height) - 6px);
+	max-height: calc(var(--day-height) - 6px);
 }
 
 .freeday {
@@ -156,7 +168,7 @@ td.daycell div {
 
 p.month {
 	font-family: 'Roboto', sans-serif;
-	font-size: 35px;
+	font-size: calc( var(--page-height) * 0.03 );
 	color: white;
 	text-align: left;
 	margin-block-start: 0mm;
@@ -165,7 +177,7 @@ p.month {
 
 p.year {
 	font-family: 'Roboto', sans-serif;
-	font-size: 50px;
+	font-size: calc( var(--page-height) * 0.044 );
 	color: black;
 	text-align: left;
 	margin-block-start: 0mm;
@@ -173,10 +185,10 @@ p.year {
 }
 
 #cover .year {
-	font-size: 100px;
+	font-size: calc( var(--page-height) * 0.088 );
 }
 
-td.othermonth {
+.othermonth {
 	opacity: 0.4;
 }
 
@@ -211,7 +223,7 @@ hr.emptyline {
 }
 
 #cover .monthbox {
-	margin-top: 25mm;
+	margin-top: calc( var(--page-height) * 0.085 );
 	margin-right: calc(0px - var(--margin-external));
 }
 

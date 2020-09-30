@@ -258,6 +258,8 @@
 		$("#country").val(calendarConfig.country);
 		loadRegions();
 		$("#region").val(calendarConfig.region);
+		$("#format")
+
 		for (var i = 0; i <= 13; i++) {
 			$("#img" + i + "-input").val(calendarConfig.imgUrl[i]);
 			$("#img" + i + "-label").val(calendarConfig.descr[i]);
@@ -403,7 +405,7 @@
         
         		makeCalendars();
         		
-        		//resizeImages();
+        		formatSelectChanged();
     		});
 		});
 	}
@@ -413,7 +415,52 @@
 		writeConfigToCookie();
 		makeCalendars();
 	}
+
+	function formatSelectChanged() {
+		calendarConfig.format=JSON.parse($("#format").val());
+		writeConfigToCookie();
+		
+		var root = document.documentElement;
+		root.style.setProperty("--page-width",calendarConfig.format.w);
+		root.style.setProperty("--page-height",calendarConfig.format.h);
+
+		if (calendarConfig.format.small) {
+			root.style.setProperty("--largepage-display","none");
+			root.style.setProperty("--smallpage-display","block");
+		} else {
+			root.style.setProperty("--largepage-display","block");
+			root.style.setProperty("--smallpage-display","none");
+		}
+
+		setTimeout(resizeDayCells, 1000);
 	
+	}
+
+	function resizeDayCells() {
+		m1 = $("#month1");
+		b1 = $("#month1 .page-border");
+
+		th = m1.find("#caltable thead");
+
+		// bottom padding like left one
+		bottomPadding = Number(b1.css('padding-left').replace('px',''));
+		pageHeight = m1.height();
+		dayCellsStart = th.position().top - m1.position().top + th.outerHeight();
+	
+		spaceLeft = pageHeight - dayCellsStart - bottomPadding;
+		rowHeight = spaceLeft/6-7; // 6 px padding and 1px border
+
+		document.documentElement.style.setProperty("--day-height",rowHeight+'px');		
+	}
+	
+	function bleedChanged() {
+		calendarConfig.bleed=JSON.parse($("#bleed").val());
+		writeConfigToCookie();
+		
+		var root = document.documentElement;
+		root.style.setProperty("--page-bleed-area",calendarConfig.bleed+"mm");
+	}
+
 	function loadRegions() {
 		var country = $("#country").val();
 		var regions = supportedCountries[country].regions;
@@ -486,12 +533,19 @@
         Stamparlo con Chrome, su un formato 216 mm x 303 mm (A4 + 3 mm abbondanza).</p>
         <p class="en hidden">This simple web page allows to create your own personalized calendar.<br>
         Insert the year, the country for holidays and a URL and an optional description for the image to insert for each month.<br>
-        Print with Chrome on a 216 mm x 303 mm paper format (A4 + 3 mm outside area).</p>
+        Print with Chrome on a 216 mm x 303 mm paper format (A4 + 3 mm bleed area).</p>
         <table>
           <tbody>
             <tr id="year-form-group">
               <td><label for="year"><span class="it hidden">Anno:</span><span class="en hidden">Year:</span></label></td>
-              <td><input type="number" id="year" onchange="yearChanged()"></td>
+							<td><input type="number" id="year" onchange="yearChanged()"></td>
+              <td><label for="year"><span class="it hidden">Formato:</span><span class="en hidden">Format:</span></label></td>
+							<td><select id="format" name="format" onchange="formatSelectChanged();">
+								<option value='{"w":"210mm","h":"297mm","small":false}'>A4</option>
+								<option value='{"w":"148.5mm","h":"210mm","small":true}'>A5</option>
+							</select></td>
+							<td><label for="year"><span class="it hidden">Abbondanza(mm):</span><span class="en hidden">Bleed Area(mm):</span></label></td>
+							<td><input type="number" id="bleed" onchange="bleedChanged()" value="3"></td>
             </tr>
             <tr id="year-form-group">
               <td><label for="country"><span class="it hidden">Paese festività:</span><span class="en hidden">Holidays country:</span></label></td>
@@ -511,53 +565,55 @@
     </form>
     <hr>
 	</div>
-	<div id="cover" class="break-after calendar">
-		<div class="page-border">
-			<div class="img-container">
-				<img class="picture" src="" id="img0">
-				<p class="description">&nbsp;<span id="img0-descr" >---</span></p>
-			</div>
-			<div class="coveryear monthbox">
-				<p id="month" class="it hidden month">CALENDARIO</p>
-				<p id="year" class="year">20xx</p>
-				<p id="month" class="en hidden month">CALENDAR</p>
-			</div>
-		</div>
-	</div>
-	<div id="month1" class="break-after calendar">
-		<div class="page-border">
-			<div class="img-container">
-				<img class="picture" src="" id="img1">
-				<p class="description">&nbsp;<span id="img1-descr" >---</span></p>
-			</div>
-			<div>
-				<div class="month-row">
-					<div class="monthbox">
-						<p id="month" class="month" />
-						<p id="year" class="year" />
-					</div>
-					<div class="lines">
-						<hr class="emptyline">
-						<hr class="emptyline">
-						<hr class="emptyline">
-					</div>
+	<div>
+		<div id="cover" class="break-after calendar">
+			<div class="page-border">
+				<div class="img-container">
+					<img class="picture" src="" id="img0">
+					<p class="description">&nbsp;<span id="img0-descr" >---</span></p>
+				</div>
+				<div class="coveryear monthbox">
+					<p id="month" class="it hidden month">CALENDARIO</p>
+					<p id="year" class="year">20xx</p>
+					<p id="month" class="en hidden month">CALENDAR</p>
 				</div>
 			</div>
-			<div class="table-border">
-				<div class="table-container">
-					<table class="caltable" id="caltable">
-						<tbody>
-							<tr>
-								<td class="weekday"><span class="it hidden">Lunedì</span> <span class="en hidden">Monday</span> </td>
-								<td class="weekday"><span class="it hidden">Martedì</span> <span class="en hidden">Tuesday</span> </td>
-								<td class="weekday"><span class="it hidden">Mercoledì</span><span class="en hidden">Wednesday</span></td>
-								<td class="weekday"><span class="it hidden">Giovedì</span> <span class="en hidden">Thursday</span> </td>
-								<td class="weekday"><span class="it hidden">Venerdì</span> <span class="en hidden">Friday</span> </td>
-								<td class="weekday"><span class="it hidden">Sabato</span> <span class="en hidden">Saturday</span> </td>
-								<td class="weekday"><span class="it hidden freeday">Domenica</span> <span class="en hidden freeday">Sunday</span> </td>
-							</tr>
-						</tbody>
-					</table>
+		</div>
+		<div id="month1" class="break-after calendar">
+			<div class="page-border">
+				<div class="img-container">
+					<img class="picture" src="" id="img1">
+					<p class="description">&nbsp;<span id="img1-descr" >---</span></p>
+				</div>
+				<div>
+					<div class="month-row">
+						<div class="monthbox">
+							<p id="month" class="month" />
+							<p id="year" class="year" />
+						</div>
+						<div class="lines">
+							<hr class="emptyline">
+							<hr class="emptyline">
+							<hr class="emptyline largepage">
+						</div>
+					</div>
+				</div>
+				<div class="table-border">
+					<div class="table-container">
+						<table class="caltable" id="caltable">
+							<tbody>
+								<thead>
+									<th class="weekday"><span class="it hidden">Lunedì</span> <span class="en hidden">Monday</span> </th>
+									<th class="weekday"><span class="it hidden">Martedì</span> <span class="en hidden">Tuesday</span> </th>
+									<th class="weekday"><span class="it hidden">Mercoledì</span><span class="en hidden">Wednesday</span></th>
+									<th class="weekday"><span class="it hidden">Giovedì</span> <span class="en hidden">Thursday</span> </th>
+									<th class="weekday"><span class="it hidden">Venerdì</span> <span class="en hidden">Friday</span> </th>
+									<th class="weekday"><span class="it hidden">Sabato</span> <span class="en hidden">Saturday</span> </th>
+									<th class="weekday"><span class="it hidden freeday">Domenica</span> <span class="en hidden freeday">Sunday</span> </th>
+								</thead>
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>
